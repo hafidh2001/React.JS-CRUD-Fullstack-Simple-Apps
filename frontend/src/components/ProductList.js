@@ -1,0 +1,71 @@
+// import module with object literal {}
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+
+const ProductList = () => {
+  // destructuring array | initial value = empty array
+  const [products, setProduct] = useState([]);
+
+  // use effect componentDidMount | initial value = empty array
+  useEffect(() => {
+    getProduct();
+  }, []);
+
+  // asynchronous arrow function expression
+  const getProduct = async () => {
+    const response = await axios.get("http://localhost:5000/products");
+    console.log(response.data);
+    setProduct(response.data);
+  };
+
+  const deleteProduct = async (id) => {
+    await axios.delete(`http://localhost:5000/products/${id}/delete`);
+    getProduct();
+  };
+
+  return (
+    <div>
+      <Link to="/add" className="button is-primary mt-2">
+        Add New
+      </Link>
+      <table className="table is-stripped is-fullwidth">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((product, index) => (
+            <tr key={product.id}>
+              <td>
+                <Link to={`/${product.id}`}>{index + 1}</Link>
+              </td>
+              <td>{product.title}</td>
+              <td>{product.price}</td>
+              <td>
+                <Link
+                  to={`/${product.id}/edit`}
+                  className="button is-small is-info"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={() => deleteProduct(product.id)}
+                  className="button is-small is-danger"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default ProductList;
